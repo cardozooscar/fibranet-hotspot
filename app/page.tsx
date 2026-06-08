@@ -83,7 +83,7 @@ export default function Home() {
               Tudo certo! ✅
             </h1>
             <p className="text-zinc-300">
-              Seus dados foram registrados. Bom navegar!
+              Seus dados foram registrados. Aproveite a navegação!
             </p>
           </div>
         ) : (
