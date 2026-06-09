@@ -137,7 +137,7 @@ export default function AdminDashboard({
 
   return (
     <div className="min-h-screen bg-[#080B11] font-sans text-slate-300 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* Background Gradient Orbs (Efeito futurista de luzes ao fundo) */}
+      {/* Background Gradient Orbs */}
       <div className="absolute top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-blue-600/10 blur-[120px] pointer-events-none" />
       <div className="absolute top-0 right-1/4 h-[400px] w-[400px] translate-x-1/2 rounded-full bg-cyan-500/5 blur-[100px] pointer-events-none" />
 
@@ -145,20 +145,14 @@ export default function AdminDashboard({
       <header className="sticky top-0 z-40 border-b border-slate-800/60 bg-[#0c1017]/75 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
-            {/* Espaço para a Logo da sua empresa */}
+            
+            {/* Logo da Empresa */}
             <div className="flex h-11 items-center justify-center">
-              {/* DESCOMENTE A LINHA ABAIXO E COLE A URL DO SEU LOGO NO src="" */}
-              {/* <img src="https://raw.githubusercontent.com/cardozooscar/imagenscgr/refs/heads/main/WhatsApp_Image_2025-10-30_at_10.21.26__1_-removebg-preview.png" alt="Fibranet Logo" className="h-9 object-contain" /> */}
-              
-              {/* Fallback visual caso a imagem não seja configurada */}
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20">
-                  <Icon name="wifi" />
-                </div>
-                <span className="text-lg font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400">
-                  FIBRA<span className="text-cyan-400">NET</span>
-                </span>
-              </div>
+              <img 
+                src="https://raw.githubusercontent.com/cardozooscar/imagenscgr/refs/heads/main/WhatsApp_Image_2025-10-30_at_10.21.26__1_-removebg-preview.png" 
+                alt="Fibranet Logo" 
+                className="h-10 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]" 
+              />
             </div>
             
             <div className="hidden h-5 w-px bg-slate-800 md:block" />
