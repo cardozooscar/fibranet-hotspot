@@ -51,6 +51,31 @@ function iniciais(nome: string) {
   return ((p[0]?.[0] ?? "") + (p[1]?.[0] ?? "")).toUpperCase() || "?";
 }
 
+// Micro-interação: Componente interno de clique para copiar de forma isolada
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch (err) {}
+  };
+  return (
+    <button
+      onClick={handleCopy}
+      className="inline-flex items-center justify-center text-slate-600 hover:text-cyan-400 p-1 rounded-md hover:bg-slate-800/60 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 ml-1"
+      title="Copiar informação"
+    >
+      {copied ? (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      ) : (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      )}
+    </button>
+  );
+}
+
 export default function AdminDashboard({
   leads,
   userEmail,
@@ -136,38 +161,35 @@ export default function AdminDashboard({
   }
 
   return (
-    <div className="min-h-screen bg-[#080B11] font-sans text-slate-300 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* Background Gradient Orbs */}
-      <div className="absolute top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-blue-600/10 blur-[120px] pointer-events-none" />
-      <div className="absolute top-0 right-1/4 h-[400px] w-[400px] translate-x-1/2 rounded-full bg-cyan-500/5 blur-[100px] pointer-events-none" />
+    <div className="min-h-screen bg-[#05070f] font-sans text-slate-300 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
+      {/* Background Neon Orbs */}
+      <div className="absolute top-0 left-1/4 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-blue-600/5 blur-[140px] pointer-events-none" />
+      <div className="absolute top-0 right-1/4 h-[500px] w-[500px] translate-x-1/2 rounded-full bg-cyan-500/5 blur-[120px] pointer-events-none" />
 
       {/* Header Estilo Cyberpunk/SaaS Moderno */}
-      <header className="sticky top-0 z-40 border-b border-slate-800/60 bg-[#0c1017]/75 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-slate-900 bg-[#070913]/75 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
-            
-            {/* Logo da Empresa */}
             <div className="flex h-11 items-center justify-center">
               <img 
                 src="https://raw.githubusercontent.com/cardozooscar/imagenscgr/refs/heads/main/WhatsApp_Image_2025-10-30_at_10.21.26__1_-removebg-preview.png" 
                 alt="Fibranet Logo" 
-                className="h-10 object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]" 
+                className="h-10 object-contain drop-shadow-[0_0_10px_rgba(6,182,212,0.35)]" 
               />
             </div>
-            
             <div className="hidden h-5 w-px bg-slate-800 md:block" />
-            <span className="hidden rounded-full border border-cyan-500/20 bg-cyan-500/5 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-cyan-400 md:inline-block">
-              Hotspot Admin
+            <span className="hidden rounded-full border border-cyan-500/10 bg-cyan-500/5 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-cyan-400 md:inline-block">
+              NOC Hotspot v2.4
             </span>
           </div>
 
           <div className="flex items-center gap-6">
             <div className="hidden flex-col items-end sm:flex">
-              <span className="text-xs text-slate-500 font-medium">Sessão ativa</span>
-              <span className="text-sm font-semibold text-slate-300">{userEmail}</span>
+              <span className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">Operador</span>
+              <span className="text-sm font-semibold text-slate-400">{userEmail}</span>
             </div>
             <form action="/admin/logout" method="post">
-              <button className="group relative overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-2 text-sm font-bold text-slate-400 transition-all hover:border-red-500/40 hover:text-red-400">
+              <button className="group relative overflow-hidden rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-2 text-sm font-bold text-slate-400 transition-all hover:border-red-500/30 hover:text-red-400 hover:bg-red-950/10">
                 Sair
               </button>
             </form>
@@ -176,47 +198,82 @@ export default function AdminDashboard({
       </header>
 
       <main className="relative mx-auto max-w-7xl px-6 py-10">
-        {/* Título de Seção */}
-        <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-            <h2 className="text-2xl font-black tracking-tight text-white">Dashboard de Captura</h2>
-            <p className="text-sm text-slate-500">Monitore usuários e leads coletados via Wi-Fi em tempo real.</p>
+        <div className="mb-8">
+          <h2 className="text-2xl font-black tracking-tight text-white">Dashboard de Captura</h2>
+          <p className="text-sm text-slate-500">Monitoramento e inteligência de leads coletados via Wi-Fi Fibranet.</p>
+        </div>
+
+        {/* Sugestão 5: Grade de Estatísticas no estilo "Bento Grid" assimétrico */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Card em Destaque Maior (Ocupa 2 colunas no desktop) */}
+          <div className="lg:col-span-2 relative overflow-hidden rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-950/20 via-[#0c1017]/40 to-transparent p-6 shadow-xl backdrop-blur-sm">
+            <div className="flex items-center justify-between z-10 relative">
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Volume Total Capturado</p>
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20"><Icon name="users" /></span>
+            </div>
+            <p className="mt-4 text-5xl font-black tracking-tight text-white z-10 relative">{stats.total}</p>
+            {/* Sugestão 1: Sparkline SVG customizada para o crescimento total */}
+            <div className="absolute bottom-0 left-0 w-full h-16 opacity-40 pointer-events-none">
+              <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="grad-blue" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4"/>
+                    <stop offset="100%" stopColor="#3b82f6" stopOpacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M 0 80 Q 25 75, 50 45 T 100 15 L 100 100 L 0 100 Z" fill="url(#grad-blue)" />
+                <path d="M 0 80 Q 25 75, 50 45 T 100 15" fill="none" stroke="#3b82f6" strokeWidth="2" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Card Hoje */}
+          <div className="relative overflow-hidden rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-950/10 via-[#0c1017]/40 to-transparent p-6 shadow-xl backdrop-blur-sm">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Novos Hoje</p>
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><Icon name="calendar" /></span>
+            </div>
+            <p className="mt-4 text-4xl font-black tracking-tight text-white">{stats.hoje}</p>
+            {/* Sugestão 1: Sparkline SVG em picos para dados diários */}
+            <div className="absolute bottom-0 left-0 w-full h-12 opacity-30 pointer-events-none">
+              <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M 0 90 L 20 80 L 40 40 L 60 85 L 80 20 L 100 30" fill="none" stroke="#06b6d4" strokeWidth="2.5" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Card Últimos 7 Dias */}
+          <div className="relative overflow-hidden rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-950/10 via-[#0c1017]/40 to-transparent p-6 shadow-xl backdrop-blur-sm">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Últimos 7 dias</p>
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><Icon name="trend" /></span>
+            </div>
+            <p className="mt-4 text-4xl font-black tracking-tight text-white">{stats.ultimos7}</p>
+            {/* Sugestão 1: Sparkline SVG ondulada representando uma semana */}
+            <div className="absolute bottom-0 left-0 w-full h-12 opacity-30 pointer-events-none">
+              <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M 0 50 Q 20 20, 40 60 T 80 30 T 100 10" fill="none" stroke="#a855f7" strokeWidth="2.5" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Card Cidades Atendidas (Panorâmico na base da Bento Grid no mobile/tablet e esticado no desktop) */}
+          <div className="md:col-span-2 lg:col-span-4 relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/10 via-[#0c1017]/40 to-transparent p-5 shadow-xl backdrop-blur-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Cidades Atendidas</p>
+              <p className="mt-1 text-3xl font-black tracking-tight text-white">{stats.cidades} <span className="text-sm font-medium text-slate-500">regiões ativas</span></p>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-medium text-emerald-400/80 bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-3 md:max-w-md">
+              <span className="text-emerald-400 shrink-0"><Icon name="pin" /></span>
+              <span>Distribuição geográfica em expansão automática através dos pontos de acesso Fibranet instalados.</span>
+            </div>
           </div>
         </div>
 
-        {/* Grid de Métricas Avançadas */}
-        <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
-          <StatCard
-            label="Volume Total"
-            valor={stats.total}
-            icon="users"
-            gradient="from-blue-600/20 to-transparent border-blue-500/30 text-blue-400"
-          />
-          <StatCard 
-            label="Novos Hoje" 
-            valor={stats.hoje} 
-            icon="calendar" 
-            gradient="from-cyan-600/20 to-transparent border-cyan-500/30 text-cyan-400"
-          />
-          <StatCard
-            label="Últimos 7 dias"
-            valor={stats.ultimos7}
-            icon="trend"
-            gradient="from-purple-600/20 to-transparent border-purple-500/30 text-purple-400"
-          />
-          <StatCard 
-            label="Cidades Atendidas" 
-            valor={stats.cidades} 
-            icon="pin" 
-            gradient="from-emerald-600/20 to-transparent border-emerald-500/30 text-emerald-400"
-          />
-        </div>
-
-        {/* Glass Box do Filtro + Tabela */}
-        <div className="mt-10 rounded-2xl border border-slate-800/80 bg-[#0c1017]/60 shadow-2xl backdrop-blur-md">
+        {/* Central de Filtros e Tabela */}
+        <div className="mt-10 rounded-2xl border border-slate-900 bg-[#0a0d14]/70 shadow-2xl backdrop-blur-md">
           
-          {/* Painel de Controle de Filtros */}
-          <div className="flex flex-wrap items-center gap-4 border-b border-slate-800/80 p-5">
+          <div className="flex flex-wrap items-center gap-4 border-b border-slate-900 p-5">
             <div className="relative min-w-[280px] flex-1">
               <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500">
                 <Icon name="search" />
@@ -228,12 +285,12 @@ export default function AdminDashboard({
                   setBusca(e.target.value);
                   setPagina(1);
                 }}
-                placeholder="Filtrar por cliente, e-mail, celular ou cidade..."
-                className="w-full rounded-xl border border-slate-800 bg-[#07090e]/80 py-3 pl-11 pr-4 text-sm text-white placeholder:text-slate-600 outline-none transition focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30"
+                placeholder="Filtrar por nome, e-mail, celular ou cidade..."
+                className="w-full rounded-xl border border-slate-800 bg-[#05060b] py-3 pl-11 pr-4 text-sm text-white placeholder:text-slate-600 outline-none transition focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20"
               />
             </div>
             
-            <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#07090e]/40 p-1.5">
+            <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#05060b]/60 p-1.5">
               <input
                 type="date"
                 value={de}
@@ -255,15 +312,6 @@ export default function AdminDashboard({
               />
             </div>
 
-            {(busca || de || ate) && (
-              <button
-                onClick={limpar}
-                className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-slate-400 transition hover:bg-slate-800 hover:text-white"
-              >
-                Limpar Filtros
-              </button>
-            )}
-
             <button
               onClick={exportarCSV}
               className="ml-auto inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/10 transition-all hover:brightness-110 active:scale-95"
@@ -273,19 +321,43 @@ export default function AdminDashboard({
             </button>
           </div>
 
-          {/* Info bar da contagem */}
-          <div className="bg-[#0e141f]/40 px-6 py-2 border-b border-slate-800/40">
+          {/* Sugestão 3: Sistema de Chips para Filtros Ativos (Conectado aos states existentes) */}
+          {(busca || de || ate) && (
+            <div className="flex flex-wrap items-center gap-2 bg-[#0d111a]/40 px-5 py-2.5 border-b border-slate-900/60">
+              <span className="text-xs text-slate-500 font-semibold mr-1">Filtros aplicados:</span>
+              {busca && (
+                <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 bg-[#05070f] px-2.5 py-1 text-xs font-medium text-slate-400">
+                  Termo: <strong className="text-cyan-400">"{busca}"</strong>
+                  <button onClick={() => { setBusca(""); setPagina(1); }} className="hover:text-red-400 font-bold ml-1 text-slate-500 transition-colors">✕</button>
+                </span>
+              )}
+              {de && (
+                <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 bg-[#05070f] px-2.5 py-1 text-xs font-medium text-slate-400">
+                  A partir de: <strong className="text-cyan-400">{de}</strong>
+                  <button onClick={() => { setDe(""); setPagina(1); }} className="hover:text-red-400 font-bold ml-1 text-slate-500 transition-colors">✕</button>
+                </span>
+              )}
+              {ate && (
+                <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 bg-[#05070f] px-2.5 py-1 text-xs font-medium text-slate-400">
+                  Até: <strong className="text-cyan-400">{ate}</strong>
+                  <button onClick={() => { setAte(""); setPagina(1); }} className="hover:text-red-400 font-bold ml-1 text-slate-500 transition-colors">✕</button>
+                </span>
+              )}
+              <button onClick={limpar} className="text-xs text-slate-500 hover:text-white font-bold ml-2 underline underline-offset-4 decoration-slate-700">Limpar tudo</button>
+            </div>
+          )}
+
+          <div className="bg-[#0b0e16]/90 px-6 py-2.5 border-b border-slate-900/60 flex items-center justify-between">
             <p className="text-xs font-medium text-slate-500">
-              Query retornou <span className="text-cyan-400 font-bold">{filtrados.length}</span> registros 
+              A listagem retornou <span className="text-cyan-400 font-bold">{filtrados.length}</span> registros mapeados 
               {filtrados.length !== leads.length && ` de um total de ${leads.length}`}
             </p>
           </div>
 
-          {/* Área da Tabela */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm border-collapse">
               <thead>
-                <tr className="border-b border-slate-800/80 bg-[#0e141f]/60 text-xs font-bold uppercase tracking-wider text-slate-400">
+                <tr className="border-b border-slate-900 bg-[#0a0d14] text-xs font-bold uppercase tracking-wider text-slate-400">
                   <th className="px-6 py-4">Usuário / Identificação</th>
                   <th className="px-6 py-4">Informações de Contato</th>
                   <th className="px-6 py-4">Cidade / Região</th>
@@ -293,61 +365,80 @@ export default function AdminDashboard({
                   <th className="px-6 py-4 text-right">Data/Hora</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/50">
-                {visiveis.map((l) => (
-                  <tr key={l.id} className="transition-colors hover:bg-slate-800/20 group">
-                    {/* Usuário */}
-                    <td className="px-6 py-4.5">
-                      <div className="flex items-center gap-3.5">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-xs font-black text-cyan-400 border border-slate-700/60 group-hover:border-cyan-500/30 group-hover:bg-cyan-950/20 transition-all">
-                          {iniciais(l.nome)}
-                        </div>
-                        <span className="font-bold text-white tracking-wide group-hover:text-cyan-300 transition-colors">
-                          {l.nome}
-                        </span>
-                      </div>
-                    </td>
-                    
-                    {/* Contato */}
-                    <td className="px-6 py-4.5">
-                      <div className="font-medium text-slate-300">{l.email || "—"}</div>
-                      <div className="mt-0.5 font-mono text-xs text-slate-500">
-                        {l.telefone || "—"}
-                      </div>
-                    </td>
-                    
-                    {/* Cidade */}
-                    <td className="px-6 py-4.5 font-semibold text-slate-400">
-                      {l.cidade || "—"}
-                    </td>
-                    
-                    {/* MAC AP */}
-                    <td className="px-6 py-4.5">
-                      {l.mac_ap ? (
-                        <span className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 px-2.5 py-1 font-mono text-[11px] font-bold text-slate-400 shadow-inner group-hover:border-slate-700 transition-colors">
-                          {l.mac_ap}
-                        </span>
-                      ) : (
-                        <span className="text-slate-600">—</span>
-                      )}
-                    </td>
-                    
-                    {/* Data */}
-                    <td className="whitespace-nowrap px-6 py-4.5 text-right font-mono text-xs text-slate-500">
-                      {dataHoraBR(l.created_at)}
-                    </td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-slate-900/50">
+                {visiveis.map((l) => {
+                  // Sugestão 2: Verificação do indicador LIVE para o dia de hoje
+                  const isHoje = diaBR(l.created_at) === hojeBR();
 
+                  return (
+                    <tr key={l.id} className="transition-all hover:bg-slate-900/30 group">
+                      {/* Usuário */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3.5">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-xs font-black text-cyan-400 border border-slate-800 group-hover:border-cyan-500/30 group-hover:bg-cyan-950/10 transition-all">
+                            {iniciais(l.nome)}
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-bold text-white tracking-wide group-hover:text-cyan-300 transition-colors">
+                              {l.nome}
+                            </span>
+                            {isHoje && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400 border border-emerald-500/20 w-max animate-pulse">
+                                <span className="h-1 w-1 rounded-full bg-emerald-400"></span>
+                                LIVE
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      
+                      {/* Contato + Sugestão 4: Micro-interação de Clicar para copiar em hover */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center font-medium text-slate-300">
+                          <span>{l.email || "—"}</span>
+                          {l.email && <CopyButton text={l.email} />}
+                        </div>
+                        <div className="mt-0.5 font-mono text-xs text-slate-500 flex items-center">
+                          <span>{l.telefone || "—"}</span>
+                          {l.telefone && <CopyButton text={l.telefone} />}
+                        </div>
+                      </td>
+                      
+                      {/* Cidade */}
+                      <td className="px-6 py-4 font-semibold text-slate-400">
+                        {l.cidade || "—"}
+                      </td>
+                      
+                      {/* MAC AP + Sugestão 4: Clicar para copiar integrado */}
+                      <td className="px-6 py-4">
+                        {l.mac_ap ? (
+                          <div className="inline-flex items-center rounded-lg border border-slate-900 bg-slate-950 px-2.5 py-1 font-mono text-[11px] font-bold text-slate-400 shadow-inner group-hover:border-slate-800 transition-colors">
+                            <span>{l.mac_ap}</span>
+                            <CopyButton text={l.mac_ap} />
+                          </div>
+                        ) : (
+                          <span className="text-slate-700">—</span>
+                        )}
+                      </td>
+                      
+                      {/* Data */}
+                      <td className="whitespace-nowrap px-6 py-4 text-right font-mono text-xs text-slate-500">
+                        {dataHoraBR(l.created_at)}
+                      </td>
+                    </tr>
+                  );
+                })}
+
+                {/* Sugestão 6: Layout Premium para tela de feedback vazio */}
                 {visiveis.length === 0 && (
                   <tr>
                     <td colSpan={5} className="px-6 py-24 text-center">
-                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 border border-slate-800 text-slate-600">
+                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-950 border border-slate-900 text-slate-700 shadow-inner">
                         <Icon name="inbox" />
                       </div>
-                      <h4 className="text-base font-bold text-slate-400">Nenhum registro mapeado</h4>
+                      <h4 className="text-base font-bold text-slate-400">Varredura Concluída</h4>
                       <p className="mt-1 text-sm text-slate-600 max-w-xs mx-auto">
-                        Não existem leads capturados para os critérios informados nesta pesquisa.
+                        Nenhum registro correspondente foi localizado nos filtros atuais da infraestrutura Hotspot.
                       </p>
                     </td>
                   </tr>
@@ -358,7 +449,7 @@ export default function AdminDashboard({
 
           {/* Paginação Estilo Grid */}
           {filtrados.length > 0 && (
-            <div className="flex items-center justify-between border-t border-slate-800/80 bg-[#0e141f]/30 px-6 py-4 text-sm">
+            <div className="flex items-center justify-between border-t border-slate-900 bg-[#0a0d14]/50 px-6 py-4 text-sm">
               <span className="font-medium text-slate-500">
                 Mostrando <span className="text-slate-300 font-bold">{inicio + 1}</span> a <span className="text-slate-300 font-bold">{Math.min(inicio + POR_PAGINA, filtrados.length)}</span> de{" "}
                 <span className="text-cyan-400 font-bold">{filtrados.length}</span> bases filtradas
@@ -368,7 +459,7 @@ export default function AdminDashboard({
                 <button
                   onClick={() => setPagina((p) => Math.max(1, p - 1))}
                   disabled={paginaSegura === 1}
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 px-4 py-2 font-bold text-slate-400 transition hover:bg-slate-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-slate-900 disabled:hover:text-slate-400"
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 font-bold text-slate-400 transition hover:bg-slate-900 hover:text-white disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:bg-slate-950 disabled:hover:text-slate-400"
                 >
                   <Icon name="left" />
                   Anterior
@@ -376,7 +467,7 @@ export default function AdminDashboard({
                 <button
                   onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
                   disabled={paginaSegura === totalPaginas}
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 px-4 py-2 font-bold text-slate-400 transition hover:bg-slate-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-slate-900 disabled:hover:text-slate-400"
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 font-bold text-slate-400 transition hover:bg-slate-900 hover:text-white disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:bg-slate-950 disabled:hover:text-slate-400"
                 >
                   Próxima
                   <Icon name="right" />
@@ -386,32 +477,6 @@ export default function AdminDashboard({
           )}
         </div>
       </main>
-    </div>
-  );
-}
-
-function StatCard({
-  label,
-  valor,
-  icon,
-  gradient,
-}: {
-  label: string;
-  valor: number;
-  icon: IconName;
-  gradient: string;
-}) {
-  return (
-    <div className={`relative overflow-hidden rounded-2xl border bg-[#0c1017]/40 p-6 shadow-xl backdrop-blur-sm bg-gradient-to-br ${gradient}`}>
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
-          {label}
-        </p>
-        <span className="opacity-80">
-          <Icon name={icon} />
-        </span>
-      </div>
-      <p className="mt-4 text-4xl font-black tracking-tight text-white">{valor}</p>
     </div>
   );
 }
@@ -490,8 +555,8 @@ function Icon({ name }: { name: IconName }) {
   };
   return (
     <svg
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
