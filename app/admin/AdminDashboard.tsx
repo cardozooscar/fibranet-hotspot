@@ -51,7 +51,7 @@ function iniciais(nome: string) {
   return ((p[0]?.[0] ?? "") + (p[1]?.[0] ?? "")).toUpperCase() || "?";
 }
 
-// Micro-interação: Componente interno de clique para copiar de forma isolada
+// Micro-interação: Clique para copiar isolado
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   const handleCopy = async () => {
@@ -65,7 +65,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       onClick={handleCopy}
       className="inline-flex items-center justify-center text-slate-600 hover:text-cyan-400 p-1 rounded-md hover:bg-slate-800/60 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 ml-1"
-      title="Copiar informação"
+      title="Copiar"
     >
       {copied ? (
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -87,6 +87,12 @@ export default function AdminDashboard({
   const [de, setDe] = useState("");
   const [ate, setAte] = useState("");
   const [pagina, setPagina] = useState(1);
+
+  // Controle local para navegação do componente visual do calendário
+  const [calNav, setCalNav] = useState(() => {
+    const d = new Date();
+    return { month: d.getMonth(), year: d.getFullYear() };
+  });
 
   const stats = useMemo(() => {
     const hoje = hojeBR();
@@ -122,6 +128,16 @@ export default function AdminDashboard({
   const paginaSegura = Math.min(pagina, totalPaginas);
   const inicio = (paginaSegura - 1) * POR_PAGINA;
   const visiveis = filtrados.slice(inicio, inicio + POR_PAGINA);
+
+  // Mapeamento de volume de leads por dia para alimentar o Heatmap do calendário rápido
+  const leadsPorDiaMap = useMemo(() => {
+    const mapa: Record<string, number> = {};
+    leads.forEach((l) => {
+      const dia = diaBR(l.created_at);
+      mapa[dia] = (mapa[dia] || 0) + 1;
+    });
+    return mapa;
+  }, [leads]);
 
   function limpar() {
     setBusca("");
@@ -160,13 +176,39 @@ export default function AdminDashboard({
     URL.revokeObjectURL(url);
   }
 
+  // Geração da matriz de dias do calendário selecionado
+  const { matrizCalendario, nomeMes } = useMemo(() => {
+    const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const primeiroDiaSemana = new Date(calNav.year, calNav.month, 1).getDay();
+    const totalDiasMes = new Date(calNav.year, calNav.month + 1, 0).getDate();
+    
+    const dias = [];
+    for (let i = 0; i < primeiroDiaSemana; i++) {
+      dias.push(null);
+    }
+    for (let d = 1; d <= totalDiasMes; d++) {
+      dias.push(d);
+    }
+    return { matrizCalendario: dias, nomeMes: nomesMeses[calNav.month] };
+  }, [calNav]);
+
+  const mudarMes = (direcao: number) => {
+    setCalNav((prev) => {
+      let novoMes = prev.month + direcao;
+      let novoAno = prev.year;
+      if (novoMes > 11) { novoMes = 0; novoAno += 1; }
+      if (novoMes < 0) { novoMes = 11; novoAno -= 1; }
+      return { month: novoMes, year: novoAno };
+    });
+  };
+
   return (
     <div className="min-h-screen bg-[#05070f] font-sans text-slate-300 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
       {/* Background Neon Orbs */}
-      <div className="absolute top-0 left-1/4 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-blue-600/5 blur-[140px] pointer-events-none" />
-      <div className="absolute top-0 right-1/4 h-[500px] w-[500px] translate-x-1/2 rounded-full bg-cyan-500/5 blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-blue-600/5 blur-[140px] pointer-events-none" />
+      <div className="absolute top-0 right-1/4 h-[400px] w-[400px] translate-x-1/2 rounded-full bg-cyan-500/5 blur-[120px] pointer-events-none" />
 
-      {/* Header Estilo Cyberpunk/SaaS Moderno */}
+      {/* Header */}
       <header className="sticky top-0 z-40 border-b border-slate-900 bg-[#070913]/75 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
@@ -179,7 +221,7 @@ export default function AdminDashboard({
             </div>
             <div className="hidden h-5 w-px bg-slate-800 md:block" />
             <span className="hidden rounded-full border border-cyan-500/10 bg-cyan-500/5 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-cyan-400 md:inline-block">
-              NOC Hotspot v2.4
+              NOC Hotspot v2.5
             </span>
           </div>
 
@@ -189,7 +231,7 @@ export default function AdminDashboard({
               <span className="text-sm font-semibold text-slate-400">{userEmail}</span>
             </div>
             <form action="/admin/logout" method="post">
-              <button className="group relative overflow-hidden rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-2 text-sm font-bold text-slate-400 transition-all hover:border-red-500/30 hover:text-red-400 hover:bg-red-950/10">
+              <button className="rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-2 text-sm font-bold text-slate-400 transition-all hover:border-red-500/30 hover:text-red-400 hover:bg-red-950/10">
                 Sair
               </button>
             </form>
@@ -198,43 +240,28 @@ export default function AdminDashboard({
       </header>
 
       <main className="relative mx-auto max-w-7xl px-6 py-10">
-        <div className="mb-8">
-          <h2 className="text-2xl font-black tracking-tight text-white">Dashboard de Captura</h2>
-          <p className="text-sm text-slate-500">Monitoramento e inteligência de leads coletados via Wi-Fi Fibranet.</p>
-        </div>
-
-        {/* Sugestão 5: Grade de Estatísticas no estilo "Bento Grid" assimétrico */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {/* Card em Destaque Maior (Ocupa 2 colunas no desktop) */}
+        {/* Bento Grid de Estatísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
           <div className="lg:col-span-2 relative overflow-hidden rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-950/20 via-[#0c1017]/40 to-transparent p-6 shadow-xl backdrop-blur-sm">
-            <div className="flex items-center justify-between z-10 relative">
+            <div className="flex items-center justify-between">
               <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Volume Total Capturado</p>
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20"><Icon name="users" /></span>
             </div>
-            <p className="mt-4 text-5xl font-black tracking-tight text-white z-10 relative">{stats.total}</p>
-            {/* Sugestão 1: Sparkline SVG customizada para o crescimento total */}
+            <p className="mt-4 text-5xl font-black tracking-tight text-white">{stats.total}</p>
             <div className="absolute bottom-0 left-0 w-full h-16 opacity-40 pointer-events-none">
               <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="grad-blue" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4"/>
-                    <stop offset="100%" stopColor="#3b82f6" stopOpacity="0"/>
-                  </linearGradient>
-                </defs>
                 <path d="M 0 80 Q 25 75, 50 45 T 100 15 L 100 100 L 0 100 Z" fill="url(#grad-blue)" />
                 <path d="M 0 80 Q 25 75, 50 45 T 100 15" fill="none" stroke="#3b82f6" strokeWidth="2" />
               </svg>
             </div>
           </div>
 
-          {/* Card Hoje */}
           <div className="relative overflow-hidden rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-950/10 via-[#0c1017]/40 to-transparent p-6 shadow-xl backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Novos Hoje</p>
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><Icon name="calendar" /></span>
             </div>
             <p className="mt-4 text-4xl font-black tracking-tight text-white">{stats.hoje}</p>
-            {/* Sugestão 1: Sparkline SVG em picos para dados diários */}
             <div className="absolute bottom-0 left-0 w-full h-12 opacity-30 pointer-events-none">
               <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <path d="M 0 90 L 20 80 L 40 40 L 60 85 L 80 20 L 100 30" fill="none" stroke="#06b6d4" strokeWidth="2.5" />
@@ -242,239 +269,288 @@ export default function AdminDashboard({
             </div>
           </div>
 
-          {/* Card Últimos 7 Dias */}
           <div className="relative overflow-hidden rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-950/10 via-[#0c1017]/40 to-transparent p-6 shadow-xl backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Últimos 7 dias</p>
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20"><Icon name="trend" /></span>
             </div>
             <p className="mt-4 text-4xl font-black tracking-tight text-white">{stats.ultimos7}</p>
-            {/* Sugestão 1: Sparkline SVG ondulada representando uma semana */}
             <div className="absolute bottom-0 left-0 w-full h-12 opacity-30 pointer-events-none">
               <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <path d="M 0 50 Q 20 20, 40 60 T 80 30 T 100 10" fill="none" stroke="#a855f7" strokeWidth="2.5" />
               </svg>
             </div>
           </div>
-
-          {/* Card Cidades Atendidas (Panorâmico na base da Bento Grid no mobile/tablet e esticado no desktop) */}
-          <div className="md:col-span-2 lg:col-span-4 relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/10 via-[#0c1017]/40 to-transparent p-5 shadow-xl backdrop-blur-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Cidades Atendidas</p>
-              <p className="mt-1 text-3xl font-black tracking-tight text-white">{stats.cidades} <span className="text-sm font-medium text-slate-500">regiões ativas</span></p>
-            </div>
-            <div className="flex items-center gap-2 text-xs font-medium text-emerald-400/80 bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-3 md:max-w-md">
-              <span className="text-emerald-400 shrink-0"><Icon name="pin" /></span>
-              <span>Distribuição geográfica em expansão automática através dos pontos de acesso Fibranet instalados.</span>
-            </div>
-          </div>
         </div>
 
-        {/* Central de Filtros e Tabela */}
-        <div className="mt-10 rounded-2xl border border-slate-900 bg-[#0a0d14]/70 shadow-2xl backdrop-blur-md">
+        {/* TOOLBAR DE BUSCA GLOBAL */}
+        <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-slate-900 bg-[#0a0d14]/90 p-4 mb-6 shadow-xl">
+          <div className="relative min-w-[280px] flex-1">
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500">
+              <Icon name="search" />
+            </span>
+            <input
+              type="text"
+              value={busca}
+              onChange={(e) => {
+                setBusca(e.target.value);
+                setPagina(1);
+              }}
+              placeholder="Buscar por nome, e-mail, celular ou cidade na lista atual..."
+              className="w-full rounded-xl border border-slate-800 bg-[#05060b] py-3 pl-11 pr-4 text-sm text-white placeholder:text-slate-600 outline-none transition focus:border-cyan-500/50"
+            />
+          </div>
           
-          <div className="flex flex-wrap items-center gap-4 border-b border-slate-900 p-5">
-            <div className="relative min-w-[280px] flex-1">
-              <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500">
-                <Icon name="search" />
-              </span>
-              <input
-                type="text"
-                value={busca}
-                onChange={(e) => {
-                  setBusca(e.target.value);
-                  setPagina(1);
-                }}
-                placeholder="Filtrar por nome, e-mail, celular ou cidade..."
-                className="w-full rounded-xl border border-slate-800 bg-[#05060b] py-3 pl-11 pr-4 text-sm text-white placeholder:text-slate-600 outline-none transition focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20"
-              />
-            </div>
-            
-            <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#05060b]/60 p-1.5">
-              <input
-                type="date"
-                value={de}
-                onChange={(e) => {
-                  setDe(e.target.value);
-                  setPagina(1);
-                }}
-                className="bg-transparent px-2 py-1.5 text-sm font-medium text-slate-400 outline-none filter invert brightness-200 focus:text-cyan-400"
-              />
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-600">até</span>
-              <input
-                type="date"
-                value={ate}
-                onChange={(e) => {
-                  setAte(e.target.value);
-                  setPagina(1);
-                }}
-                className="bg-transparent px-2 py-1.5 text-sm font-medium text-slate-400 outline-none filter invert brightness-200 focus:text-cyan-400"
-              />
-            </div>
-
-            <button
-              onClick={exportarCSV}
-              className="ml-auto inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/10 transition-all hover:brightness-110 active:scale-95"
-            >
-              <Icon name="download" />
-              Exportar Base
-            </button>
+          {/* Inputs ocultos ou mini para manter compatibilidade total de formulário/filtros manuais se necessário */}
+          <div className="hidden md:flex items-center gap-2 rounded-xl border border-slate-800 bg-[#05060b]/40 p-1.5 text-xs text-slate-500 font-medium">
+            Período ativo: <span className="text-cyan-400 font-mono">{de || "Início"}</span> até <span className="text-cyan-400 font-mono">{ate || "Fim"}</span>
           </div>
 
-          {/* Sugestão 3: Sistema de Chips para Filtros Ativos (Conectado aos states existentes) */}
-          {(busca || de || ate) && (
-            <div className="flex flex-wrap items-center gap-2 bg-[#0d111a]/40 px-5 py-2.5 border-b border-slate-900/60">
-              <span className="text-xs text-slate-500 font-semibold mr-1">Filtros aplicados:</span>
-              {busca && (
-                <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 bg-[#05070f] px-2.5 py-1 text-xs font-medium text-slate-400">
-                  Termo: <strong className="text-cyan-400">"{busca}"</strong>
-                  <button onClick={() => { setBusca(""); setPagina(1); }} className="hover:text-red-400 font-bold ml-1 text-slate-500 transition-colors">✕</button>
-                </span>
-              )}
-              {de && (
-                <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 bg-[#05070f] px-2.5 py-1 text-xs font-medium text-slate-400">
-                  A partir de: <strong className="text-cyan-400">{de}</strong>
-                  <button onClick={() => { setDe(""); setPagina(1); }} className="hover:text-red-400 font-bold ml-1 text-slate-500 transition-colors">✕</button>
-                </span>
-              )}
-              {ate && (
-                <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 bg-[#05070f] px-2.5 py-1 text-xs font-medium text-slate-400">
-                  Até: <strong className="text-cyan-400">{ate}</strong>
-                  <button onClick={() => { setAte(""); setPagina(1); }} className="hover:text-red-400 font-bold ml-1 text-slate-500 transition-colors">✕</button>
-                </span>
-              )}
-              <button onClick={limpar} className="text-xs text-slate-500 hover:text-white font-bold ml-2 underline underline-offset-4 decoration-slate-700">Limpar tudo</button>
-            </div>
-          )}
+          <button
+            onClick={exportarCSV}
+            className="ml-auto inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/10 transition-all hover:brightness-110 active:scale-95"
+          >
+            <Icon name="download" />
+            Exportar Base
+          </button>
+        </div>
 
-          <div className="bg-[#0b0e16]/90 px-6 py-2.5 border-b border-slate-900/60 flex items-center justify-between">
-            <p className="text-xs font-medium text-slate-500">
-              A listagem retornou <span className="text-cyan-400 font-bold">{filtrados.length}</span> registros mapeados 
-              {filtrados.length !== leads.length && ` de um total de ${leads.length}`}
-            </p>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm border-collapse">
-              <thead>
-                <tr className="border-b border-slate-900 bg-[#0a0d14] text-xs font-bold uppercase tracking-wider text-slate-400">
-                  <th className="px-6 py-4">Usuário / Identificação</th>
-                  <th className="px-6 py-4">Informações de Contato</th>
-                  <th className="px-6 py-4">Cidade / Região</th>
-                  <th className="px-6 py-4">Ponto de Acesso (AP)</th>
-                  <th className="px-6 py-4 text-right">Data/Hora</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-900/50">
-                {visiveis.map((l) => {
-                  // Sugestão 2: Verificação do indicador LIVE para o dia de hoje
-                  const isHoje = diaBR(l.created_at) === hojeBR();
-
-                  return (
-                    <tr key={l.id} className="transition-all hover:bg-slate-900/30 group">
-                      {/* Usuário */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3.5">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-xs font-black text-cyan-400 border border-slate-800 group-hover:border-cyan-500/30 group-hover:bg-cyan-950/10 transition-all">
-                            {iniciais(l.nome)}
-                          </div>
-                          <div className="flex flex-col gap-0.5">
-                            <span className="font-bold text-white tracking-wide group-hover:text-cyan-300 transition-colors">
-                              {l.nome}
-                            </span>
-                            {isHoje && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-emerald-400 border border-emerald-500/20 w-max animate-pulse">
-                                <span className="h-1 w-1 rounded-full bg-emerald-400"></span>
-                                LIVE
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      
-                      {/* Contato + Sugestão 4: Micro-interação de Clicar para copiar em hover */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center font-medium text-slate-300">
-                          <span>{l.email || "—"}</span>
-                          {l.email && <CopyButton text={l.email} />}
-                        </div>
-                        <div className="mt-0.5 font-mono text-xs text-slate-500 flex items-center">
-                          <span>{l.telefone || "—"}</span>
-                          {l.telefone && <CopyButton text={l.telefone} />}
-                        </div>
-                      </td>
-                      
-                      {/* Cidade */}
-                      <td className="px-6 py-4 font-semibold text-slate-400">
-                        {l.cidade || "—"}
-                      </td>
-                      
-                      {/* MAC AP + Sugestão 4: Clicar para copiar integrado */}
-                      <td className="px-6 py-4">
-                        {l.mac_ap ? (
-                          <div className="inline-flex items-center rounded-lg border border-slate-900 bg-slate-950 px-2.5 py-1 font-mono text-[11px] font-bold text-slate-400 shadow-inner group-hover:border-slate-800 transition-colors">
-                            <span>{l.mac_ap}</span>
-                            <CopyButton text={l.mac_ap} />
-                          </div>
-                        ) : (
-                          <span className="text-slate-700">—</span>
-                        )}
-                      </td>
-                      
-                      {/* Data */}
-                      <td className="whitespace-nowrap px-6 py-4 text-right font-mono text-xs text-slate-500">
-                        {dataHoraBR(l.created_at)}
-                      </td>
-                    </tr>
-                  );
-                })}
-
-                {/* Sugestão 6: Layout Premium para tela de feedback vazio */}
-                {visiveis.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-24 text-center">
-                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-950 border border-slate-900 text-slate-700 shadow-inner">
-                        <Icon name="inbox" />
-                      </div>
-                      <h4 className="text-base font-bold text-slate-400">Varredura Concluída</h4>
-                      <p className="mt-1 text-sm text-slate-600 max-w-xs mx-auto">
-                        Nenhum registro correspondente foi localizado nos filtros atuais da infraestrutura Hotspot.
-                      </p>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Paginação Estilo Grid */}
-          {filtrados.length > 0 && (
-            <div className="flex items-center justify-between border-t border-slate-900 bg-[#0a0d14]/50 px-6 py-4 text-sm">
-              <span className="font-medium text-slate-500">
-                Mostrando <span className="text-slate-300 font-bold">{inicio + 1}</span> a <span className="text-slate-300 font-bold">{Math.min(inicio + POR_PAGINA, filtrados.length)}</span> de{" "}
-                <span className="text-cyan-400 font-bold">{filtrados.length}</span> bases filtradas
-              </span>
-              
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPagina((p) => Math.max(1, p - 1))}
-                  disabled={paginaSegura === 1}
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 font-bold text-slate-400 transition hover:bg-slate-900 hover:text-white disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:bg-slate-950 disabled:hover:text-slate-400"
-                >
+        {/* NOVO LAYOUT: DUAS COLUNAS (CALENDÁRIO + TABELA) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          
+          {/* COLUNA ESQUERDA: CALENDÁRIO INTERATIVO */}
+          <div className="lg:col-span-1 rounded-2xl border border-slate-900 bg-[#0a0d14]/70 p-5 shadow-2xl backdrop-blur-md sticky top-28">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-900">
+              <h3 className="text-sm font-black uppercase tracking-wider text-white flex items-center gap-2">
+                <span className="text-cyan-400"><Icon name="calendar" /></span> Navegação Temporal
+              </h3>
+              <div className="flex items-center gap-1">
+                <button onClick={() => mudarMes(-1)} className="p-1.5 rounded-lg border border-slate-800 bg-slate-950 hover:bg-slate-900 text-slate-400 hover:text-white transition-colors">
                   <Icon name="left" />
-                  Anterior
                 </button>
-                <button
-                  onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
-                  disabled={paginaSegura === totalPaginas}
-                  className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 font-bold text-slate-400 transition hover:bg-slate-900 hover:text-white disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:bg-slate-950 disabled:hover:text-slate-400"
-                >
-                  Próxima
+                <span className="text-xs font-bold text-slate-300 min-w-[100px] text-center uppercase tracking-wide">
+                  {nomeMes} {calNav.year}
+                </span>
+                <button onClick={() => mudarMes(1)} className="p-1.5 rounded-lg border border-slate-800 bg-slate-950 hover:bg-slate-900 text-slate-400 hover:text-white transition-colors">
                   <Icon name="right" />
                 </button>
               </div>
             </div>
-          )}
+
+            {/* Matriz do Calendário */}
+            <div className="grid grid-cols-7 gap-1 text-center mb-4">
+              {["D", "S", "T", "Q", "Q", "S", "S"].map((d, idx) => (
+                <span key={idx} className="text-[10px] font-bold text-slate-600 py-1 uppercase">{d}</span>
+              ))}
+              
+              {matrizCalendario.map((dia, idx) => {
+                if (dia === null) return <div key={idx} className="p-2" />;
+                
+                // Monta string padrão YYYY-MM-DD para bater com diaBR
+                const dataString = `${calNav.year}-${String(calNav.month + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+                const totalLeadsDia = leadsPorDiaMap[dataString] || 0;
+                
+                // Verifica se este dia específico é o selecionado na query
+                const isSelecionado = de === dataString && ate === dataString;
+                const isHoje = dataString === hojeBR();
+
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setDe(dataString);
+                      setAte(dataString);
+                      setPagina(1);
+                    }}
+                    className={`group relative p-2 rounded-xl border text-xs font-bold transition-all flex flex-col items-center justify-center aspect-square ${
+                      isSelecionado 
+                        ? "bg-cyan-500 border-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/20 scale-105 z-10" 
+                        : isHoje
+                        ? "bg-slate-900 border-slate-700 text-cyan-400 ring-1 ring-cyan-500/20"
+                        : "bg-[#05060b]/40 border-slate-900 hover:border-slate-700 text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    <span>{dia}</span>
+                    {/* Indicador Heatmap de volume de dados coletados */}
+                    {totalLeadsDia > 0 && (
+                      <span className={`absolute bottom-1 w-4 h-3 text-[8px] font-black rounded flex items-center justify-center leading-none ${
+                        isSelecionado ? "bg-slate-950 text-cyan-400" : "bg-cyan-950 text-cyan-400 border border-cyan-500/20"
+                      }`}>
+                        {totalLeadsDia}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Controles rápidos do calendário */}
+            <div className="flex flex-col gap-2 pt-2 border-t border-slate-900">
+              <button 
+                onClick={() => {
+                  const hoje = hojeBR();
+                  setDe(hoje);
+                  setAte(hoje);
+                  setPagina(1);
+                  const d = new Date();
+                  setCalNav({ month: d.getMonth(), year: d.getFullYear() });
+                }}
+                className="w-full text-center py-2 rounded-xl bg-slate-900/60 border border-slate-800 text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-900 transition-colors"
+              >
+                Filtrar Apenas Hoje
+              </button>
+              {(busca || de || ate) && (
+                <button 
+                  onClick={limpar}
+                  className="w-full text-center py-2 rounded-xl bg-red-950/10 border border-red-900/20 text-xs font-bold text-red-400 hover:bg-red-950/20 transition-colors"
+                >
+                  Limpar Todos os Filtros
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* COLUNA DIREITA: LISTAGEM FILTRADA DA TABELA */}
+          <div className="lg:col-span-2 rounded-2xl border border-slate-900 bg-[#0a0d14]/70 shadow-2xl backdrop-blur-md overflow-hidden">
+            
+            {/* Chips de Filtros Ativos */}
+            {(busca || de || ate) && (
+              <div className="flex flex-wrap items-center gap-2 bg-[#0d111a]/40 px-5 py-3 border-b border-slate-900">
+                <span className="text-xs text-slate-500 font-semibold mr-1">Filtros:</span>
+                {busca && (
+                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 bg-[#05070f] px-2.5 py-1 text-xs font-medium text-slate-400">
+                    Busca: <strong className="text-cyan-400">"{busca}"</strong>
+                    <button onClick={() => { setBusca(""); setPagina(1); }} className="hover:text-red-400 ml-1 text-slate-500">✕</button>
+                  </span>
+                )}
+                {(de || ate) && (
+                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-800 bg-[#05070f] px-2.5 py-1 text-xs font-medium text-slate-400">
+                    Período: <strong className="text-cyan-400">{de === ate ? de : `${de || "Início"} a ${ate || "Fim"}`}</strong>
+                    <button onClick={() => { setDe(""); setAte(""); setPagina(1); }} className="hover:text-red-400 ml-1 text-slate-500">✕</button>
+                  </span>
+                )}
+              </div>
+            )}
+
+            <div className="bg-[#0b0e16]/90 px-6 py-3 border-b border-slate-900/60">
+              <p className="text-xs font-medium text-slate-400">
+                Exibindo <span className="text-cyan-400 font-bold">{filtrados.length}</span> registros nesta janela temporal
+              </p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-900 bg-[#0a0d14] text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <th className="px-6 py-4">Usuário</th>
+                    <th className="px-6 py-4">Contato</th>
+                    <th className="px-6 py-4">Cidade / AP</th>
+                    <th className="px-6 py-4 text-right">Data/Hora</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-900/40">
+                  {visiveis.map((l) => {
+                    const isHoje = diaBR(l.created_at) === hojeBR();
+                    return (
+                      <tr key={l.id} className="transition-all hover:bg-slate-900/20 group">
+                        {/* Usuário */}
+                        <td className="px-6 py-4.5">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-xs font-black text-cyan-400 border border-slate-800 group-hover:border-cyan-500/30 transition-all">
+                              {iniciais(l.nome)}
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-white tracking-wide group-hover:text-cyan-300 transition-colors line-clamp-1">
+                                {l.nome}
+                              </span>
+                              {isHoje && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[8px] font-black text-emerald-400 border border-emerald-500/20 w-max mt-0.5 animate-pulse">
+                                  LIVE
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        
+                        {/* Contato */}
+                        <td className="px-6 py-4.5">
+                          <div className="flex items-center font-medium text-slate-300 text-xs max-w-[160px] truncate">
+                            <span>{l.email || "—"}</span>
+                            {l.email && <CopyButton text={l.email} />}
+                          </div>
+                          <div className="mt-0.5 font-mono text-[11px] text-slate-500 flex items-center">
+                            <span>{l.telefone || "—"}</span>
+                            {l.telefone && <CopyButton text={l.telefone} />}
+                          </div>
+                        </td>
+                        
+                        {/* Cidade / AP */}
+                        <td className="px-6 py-4.5 text-xs">
+                          <div className="font-semibold text-slate-400 truncate max-w-[120px]">{l.cidade || "—"}</div>
+                          <div className="mt-0.5">
+                            {l.mac_ap ? (
+                              <span className="inline-flex items-center font-mono text-[10px] font-bold text-slate-500 group-hover:text-slate-400 transition-colors">
+                                AP: {l.mac_ap}
+                                <CopyButton text={l.mac_ap} />
+                              </span>
+                            ) : (
+                              <span className="text-slate-800">—</span>
+                            )}
+                          </div>
+                        </td>
+                        
+                        {/* Data */}
+                        <td className="whitespace-nowrap px-6 py-4.5 text-right font-mono text-xs text-slate-500">
+                          {dataHoraBR(l.created_at)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  {visiveis.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-20 text-center">
+                        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-950 border border-slate-900 text-slate-700">
+                          <Icon name="inbox" />
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-400">Nenhum registro mapeado</h4>
+                        <p className="mt-1 text-xs text-slate-600 max-w-xs mx-auto">
+                          Selecione outro dia no calendário ou limpe os filtros ativos para ver mais dados.
+                        </p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Paginação */}
+            {filtrados.length > 0 && (
+              <div className="flex items-center justify-between border-t border-slate-900 bg-[#0a0d14]/40 px-6 py-3 text-xs">
+                <span className="font-medium text-slate-500">
+                  <span className="text-slate-300 font-bold">{inicio + 1}</span>-<span className="text-slate-300 font-bold">{Math.min(inicio + POR_PAGINA, filtrados.length)}</span> de <span className="text-cyan-400 font-bold">{filtrados.length}</span>
+                </span>
+                
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                    disabled={paginaSegura === 1}
+                    className="inline-flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-950 px-3 py-1.5 font-bold text-slate-400 transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-20"
+                  >
+                    <Icon name="left" />
+                  </button>
+                  <button
+                    onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                    disabled={paginaSegura === totalPaginas}
+                    className="inline-flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-950 px-3 py-1.5 font-bold text-slate-400 transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-20"
+                  >
+                    <Icon name="right" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
       </main>
     </div>
@@ -555,8 +631,8 @@ function Icon({ name }: { name: IconName }) {
   };
   return (
     <svg
-      width="16"
-      height="16"
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
