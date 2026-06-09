@@ -136,27 +136,29 @@ export default function AdminDashboard({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
-      {/* Header */}
-      <header className="border-b border-slate-200 bg-white">
+    <div className="min-h-screen bg-slate-50/50 font-sans text-slate-800 selection:bg-indigo-100 selection:text-indigo-900">
+      {/* Header com Glassmorphism */}
+      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur-md shadow-sm shadow-slate-100">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-indigo-200">
               <Icon name="wifi" />
             </div>
             <div>
-              <p className="text-sm font-semibold leading-tight">
+              <h1 className="text-base font-bold tracking-tight text-slate-900">
                 Fibranet Brasil
+              </h1>
+              <p className="text-xs font-medium text-slate-500">
+                Painel de Gestão de Leads
               </p>
-              <p className="text-xs text-slate-500">Painel de Leads</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="hidden text-sm text-slate-500 sm:inline">
+          <div className="flex items-center gap-5">
+            <span className="hidden text-sm font-medium text-slate-500 sm:inline">
               {userEmail}
             </span>
             <form action="/admin/logout" method="post">
-              <button className="rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
+              <button className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 hover:shadow-sm">
                 Sair
               </button>
             </form>
@@ -164,27 +166,43 @@ export default function AdminDashboard({
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
-        {/* Cartões */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <main className="mx-auto max-w-7xl px-6 py-10">
+        {/* Cartões de Estatísticas com Hover Effect */}
+        <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
           <StatCard
             label="Total de leads"
             valor={stats.total}
             icon="users"
+            color="from-blue-500 to-blue-600"
+            bgIcon="bg-blue-50 text-blue-600"
           />
-          <StatCard label="Hoje" valor={stats.hoje} icon="calendar" />
+          <StatCard 
+            label="Hoje" 
+            valor={stats.hoje} 
+            icon="calendar" 
+            color="from-indigo-500 to-indigo-600"
+            bgIcon="bg-indigo-50 text-indigo-600"
+          />
           <StatCard
             label="Últimos 7 dias"
             valor={stats.ultimos7}
             icon="trend"
+            color="from-violet-500 to-violet-600"
+            bgIcon="bg-violet-50 text-violet-600"
           />
-          <StatCard label="Cidades" valor={stats.cidades} icon="pin" />
+          <StatCard 
+            label="Cidades" 
+            valor={stats.cidades} 
+            icon="pin" 
+            color="from-emerald-500 to-emerald-600"
+            bgIcon="bg-emerald-50 text-emerald-600"
+          />
         </div>
 
-        {/* Toolbar */}
-        <div className="mt-8 flex flex-wrap items-center gap-3">
-          <div className="relative min-w-[240px] flex-1">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+        {/* Toolbar de Filtros */}
+        <div className="mt-10 flex flex-wrap items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-100">
+          <div className="relative min-w-[260px] flex-1">
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
               <Icon name="search" />
             </span>
             <input
@@ -194,108 +212,116 @@ export default function AdminDashboard({
                 setBusca(e.target.value);
                 setPagina(1);
               }}
-              placeholder="Buscar por nome, e-mail, telefone ou cidade"
-              className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              placeholder="Buscar por nome, e-mail, telefone ou cidade..."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-11 pr-4 text-sm text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
             />
           </div>
-          <input
-            type="date"
-            value={de}
-            onChange={(e) => {
-              setDe(e.target.value);
-              setPagina(1);
-            }}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-          />
-          <span className="text-sm text-slate-400">até</span>
-          <input
-            type="date"
-            value={ate}
-            onChange={(e) => {
-              setAte(e.target.value);
-              setPagina(1);
-            }}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-600 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-          />
+          
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={de}
+              onChange={(e) => {
+                setDe(e.target.value);
+                setPagina(1);
+              }}
+              className="rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm font-medium text-slate-600 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
+            />
+            <span className="text-sm font-medium text-slate-400">até</span>
+            <input
+              type="date"
+              value={ate}
+              onChange={(e) => {
+                setAte(e.target.value);
+                setPagina(1);
+              }}
+              className="rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm font-medium text-slate-600 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
+            />
+          </div>
+
           {(busca || de || ate) && (
             <button
               onClick={limpar}
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-500 hover:text-slate-900"
+              className="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
-              Limpar
+              Limpar Filtros
             </button>
           )}
+
           <button
             onClick={exportarCSV}
-            className="ml-auto inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+            className="ml-auto inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-300"
           >
             <Icon name="download" />
             Exportar CSV
           </button>
         </div>
 
-        <p className="mt-5 mb-3 text-sm text-slate-500">
-          {filtrados.length} registro{filtrados.length !== 1 ? "s" : ""}
-          {filtrados.length !== leads.length && ` de ${leads.length}`}
-        </p>
+        <div className="mt-6 mb-4 flex items-center justify-between">
+          <p className="text-sm font-medium text-slate-500">
+            Exibindo <strong className="text-slate-900">{filtrados.length}</strong> registro{filtrados.length !== 1 ? "s" : ""}
+            {filtrados.length !== leads.length && ` de ${leads.length} totais`}
+          </p>
+        </div>
 
-        {/* Tabela */}
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        {/* Tabela Melhorada */}
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-100">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                  <th className="px-5 py-3 font-medium">Cliente</th>
-                  <th className="px-5 py-3 font-medium">Contato</th>
-                  <th className="px-5 py-3 font-medium">Cidade</th>
-                  <th className="px-5 py-3 font-medium">AP</th>
-                  <th className="px-5 py-3 font-medium">Data</th>
+                <tr className="border-b border-slate-200 bg-slate-50/80 text-xs uppercase tracking-wider text-slate-500">
+                  <th className="px-6 py-4 font-semibold">Cliente</th>
+                  <th className="px-6 py-4 font-semibold">Contato</th>
+                  <th className="px-6 py-4 font-semibold">Cidade</th>
+                  <th className="px-6 py-4 font-semibold">MAC AP</th>
+                  <th className="px-6 py-4 font-semibold">Data de Registro</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {visiveis.map((l) => (
-                  <tr key={l.id} className="transition-colors hover:bg-slate-50">
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-semibold text-blue-700">
+                  <tr key={l.id} className="group transition-colors hover:bg-indigo-50/40">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3.5">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-100 to-blue-50 text-xs font-bold text-indigo-700 ring-2 ring-white">
                           {iniciais(l.nome)}
                         </div>
-                        <span className="font-medium text-slate-900">
+                        <span className="font-semibold text-slate-900 group-hover:text-indigo-900 transition-colors">
                           {l.nome}
                         </span>
                       </div>
                     </td>
-                    <td className="px-5 py-3.5">
-                      <div className="text-slate-700">{l.email || "—"}</div>
-                      <div className="text-xs text-slate-400">
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-slate-700">{l.email || "—"}</div>
+                      <div className="mt-0.5 text-xs text-slate-500">
                         {l.telefone || "—"}
                       </div>
                     </td>
-                    <td className="px-5 py-3.5 text-slate-600">
+                    <td className="px-6 py-4 font-medium text-slate-600">
                       {l.cidade || "—"}
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       {l.mac_ap ? (
-                        <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                        <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-[11px] font-semibold text-slate-600">
                           {l.mac_ap}
                         </span>
                       ) : (
                         <span className="text-slate-300">—</span>
                       )}
                     </td>
-                    <td className="whitespace-nowrap px-5 py-3.5 text-slate-500">
+                    <td className="whitespace-nowrap px-6 py-4 font-medium text-slate-500">
                       {dataHoraBR(l.created_at)}
                     </td>
                   </tr>
                 ))}
                 {visiveis.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-5 py-16 text-center">
-                      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                    <td colSpan={5} className="px-6 py-20 text-center">
+                      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-50 text-slate-400 ring-4 ring-slate-50/50">
                         <Icon name="inbox" />
                       </div>
-                      <p className="text-sm text-slate-500">
-                        Nenhum lead encontrado pra esses filtros.
+                      <h3 className="text-sm font-semibold text-slate-900">Nenhum lead encontrado</h3>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Tente ajustar os filtros de busca ou as datas selecionadas.
                       </p>
                     </td>
                   </tr>
@@ -304,18 +330,18 @@ export default function AdminDashboard({
             </table>
           </div>
 
-          {/* Paginação */}
+          {/* Paginação Estilizada */}
           {filtrados.length > 0 && (
-            <div className="flex items-center justify-between border-t border-slate-200 px-5 py-3 text-sm">
-              <span className="text-slate-500">
-                Mostrando {inicio + 1}–{Math.min(inicio + POR_PAGINA, filtrados.length)} de{" "}
-                {filtrados.length}
+            <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50/50 px-6 py-4 text-sm">
+              <span className="font-medium text-slate-500">
+                Mostrando <strong className="text-slate-900">{inicio + 1}</strong> a <strong className="text-slate-900">{Math.min(inicio + POR_PAGINA, filtrados.length)}</strong> de{" "}
+                <strong className="text-slate-900">{filtrados.length}</strong>
               </span>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPagina((p) => Math.max(1, p - 1))}
                   disabled={paginaSegura === 1}
-                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 font-semibold text-slate-600 transition-all hover:bg-slate-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
                 >
                   <Icon name="left" />
                   Anterior
@@ -323,7 +349,7 @@ export default function AdminDashboard({
                 <button
                   onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
                   disabled={paginaSegura === totalPaginas}
-                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 font-semibold text-slate-600 transition-all hover:bg-slate-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
                 >
                   Próxima
                   <Icon name="right" />
@@ -341,22 +367,27 @@ function StatCard({
   label,
   valor,
   icon,
+  color = "from-blue-500 to-blue-600",
+  bgIcon = "bg-blue-50 text-blue-600"
 }: {
   label: string;
   valor: number;
   icon: IconName;
+  color?: string;
+  bgIcon?: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-slate-300">
+      <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${color} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
       <div className="flex items-start justify-between">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+        <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
           {label}
         </p>
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+        <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${bgIcon}`}>
           <Icon name={icon} />
         </span>
       </div>
-      <p className="mt-3 text-3xl font-semibold tracking-tight">{valor}</p>
+      <p className="mt-4 text-4xl font-bold tracking-tight text-slate-900">{valor}</p>
     </div>
   );
 }
@@ -435,8 +466,8 @@ function Icon({ name }: { name: IconName }) {
   };
   return (
     <svg
-      width="18"
-      height="18"
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
