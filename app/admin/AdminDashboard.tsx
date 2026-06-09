@@ -136,29 +136,44 @@ export default function AdminDashboard({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 font-sans text-slate-800 selection:bg-indigo-100 selection:text-indigo-900">
-      {/* Header com Glassmorphism */}
-      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur-md shadow-sm shadow-slate-100">
+    <div className="min-h-screen bg-[#080B11] font-sans text-slate-300 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
+      {/* Background Gradient Orbs (Efeito futurista de luzes ao fundo) */}
+      <div className="absolute top-0 left-1/4 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-blue-600/10 blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 right-1/4 h-[400px] w-[400px] translate-x-1/2 rounded-full bg-cyan-500/5 blur-[100px] pointer-events-none" />
+
+      {/* Header Estilo Cyberpunk/SaaS Moderno */}
+      <header className="sticky top-0 z-40 border-b border-slate-800/60 bg-[#0c1017]/75 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-indigo-200">
-              <Icon name="wifi" />
+            {/* Espaço para a Logo da sua empresa */}
+            <div className="flex h-11 items-center justify-center">
+              {/* DESCOMENTE A LINHA ABAIXO E COLE A URL DO SEU LOGO NO src="" */}
+              {/* <img src="https://raw.githubusercontent.com/cardozooscar/imagenscgr/refs/heads/main/WhatsApp_Image_2025-10-30_at_10.21.26__1_-removebg-preview.png" alt="Fibranet Logo" className="h-9 object-contain" /> */}
+              
+              {/* Fallback visual caso a imagem não seja configurada */}
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20">
+                  <Icon name="wifi" />
+                </div>
+                <span className="text-lg font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400">
+                  FIBRA<span className="text-cyan-400">NET</span>
+                </span>
+              </div>
             </div>
-            <div>
-              <h1 className="text-base font-bold tracking-tight text-slate-900">
-                Fibranet Brasil
-              </h1>
-              <p className="text-xs font-medium text-slate-500">
-                Painel de Gestão de Leads
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-5">
-            <span className="hidden text-sm font-medium text-slate-500 sm:inline">
-              {userEmail}
+            
+            <div className="hidden h-5 w-px bg-slate-800 md:block" />
+            <span className="hidden rounded-full border border-cyan-500/20 bg-cyan-500/5 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-cyan-400 md:inline-block">
+              Hotspot Admin
             </span>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="hidden flex-col items-end sm:flex">
+              <span className="text-xs text-slate-500 font-medium">Sessão ativa</span>
+              <span className="text-sm font-semibold text-slate-300">{userEmail}</span>
+            </div>
             <form action="/admin/logout" method="post">
-              <button className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 hover:shadow-sm">
+              <button className="group relative overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50 px-4 py-2 text-sm font-bold text-slate-400 transition-all hover:border-red-500/40 hover:text-red-400">
                 Sair
               </button>
             </form>
@@ -166,162 +181,179 @@ export default function AdminDashboard({
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-6 py-10">
-        {/* Cartões de Estatísticas com Hover Effect */}
+      <main className="relative mx-auto max-w-7xl px-6 py-10">
+        {/* Título de Seção */}
+        <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight text-white">Dashboard de Captura</h2>
+            <p className="text-sm text-slate-500">Monitore usuários e leads coletados via Wi-Fi em tempo real.</p>
+          </div>
+        </div>
+
+        {/* Grid de Métricas Avançadas */}
         <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
           <StatCard
-            label="Total de leads"
+            label="Volume Total"
             valor={stats.total}
             icon="users"
-            color="from-blue-500 to-blue-600"
-            bgIcon="bg-blue-50 text-blue-600"
+            gradient="from-blue-600/20 to-transparent border-blue-500/30 text-blue-400"
           />
           <StatCard 
-            label="Hoje" 
+            label="Novos Hoje" 
             valor={stats.hoje} 
             icon="calendar" 
-            color="from-indigo-500 to-indigo-600"
-            bgIcon="bg-indigo-50 text-indigo-600"
+            gradient="from-cyan-600/20 to-transparent border-cyan-500/30 text-cyan-400"
           />
           <StatCard
             label="Últimos 7 dias"
             valor={stats.ultimos7}
             icon="trend"
-            color="from-violet-500 to-violet-600"
-            bgIcon="bg-violet-50 text-violet-600"
+            gradient="from-purple-600/20 to-transparent border-purple-500/30 text-purple-400"
           />
           <StatCard 
-            label="Cidades" 
+            label="Cidades Atendidas" 
             valor={stats.cidades} 
             icon="pin" 
-            color="from-emerald-500 to-emerald-600"
-            bgIcon="bg-emerald-50 text-emerald-600"
+            gradient="from-emerald-600/20 to-transparent border-emerald-500/30 text-emerald-400"
           />
         </div>
 
-        {/* Toolbar de Filtros */}
-        <div className="mt-10 flex flex-wrap items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-100">
-          <div className="relative min-w-[260px] flex-1">
-            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-              <Icon name="search" />
-            </span>
-            <input
-              type="text"
-              value={busca}
-              onChange={(e) => {
-                setBusca(e.target.value);
-                setPagina(1);
-              }}
-              placeholder="Buscar por nome, e-mail, telefone ou cidade..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-11 pr-4 text-sm text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
-            />
-          </div>
+        {/* Glass Box do Filtro + Tabela */}
+        <div className="mt-10 rounded-2xl border border-slate-800/80 bg-[#0c1017]/60 shadow-2xl backdrop-blur-md">
           
-          <div className="flex items-center gap-2">
-            <input
-              type="date"
-              value={de}
-              onChange={(e) => {
-                setDe(e.target.value);
-                setPagina(1);
-              }}
-              className="rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm font-medium text-slate-600 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
-            />
-            <span className="text-sm font-medium text-slate-400">até</span>
-            <input
-              type="date"
-              value={ate}
-              onChange={(e) => {
-                setAte(e.target.value);
-                setPagina(1);
-              }}
-              className="rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm font-medium text-slate-600 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
-            />
+          {/* Painel de Controle de Filtros */}
+          <div className="flex flex-wrap items-center gap-4 border-b border-slate-800/80 p-5">
+            <div className="relative min-w-[280px] flex-1">
+              <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500">
+                <Icon name="search" />
+              </span>
+              <input
+                type="text"
+                value={busca}
+                onChange={(e) => {
+                  setBusca(e.target.value);
+                  setPagina(1);
+                }}
+                placeholder="Filtrar por cliente, e-mail, celular ou cidade..."
+                className="w-full rounded-xl border border-slate-800 bg-[#07090e]/80 py-3 pl-11 pr-4 text-sm text-white placeholder:text-slate-600 outline-none transition focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30"
+              />
+            </div>
+            
+            <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#07090e]/40 p-1.5">
+              <input
+                type="date"
+                value={de}
+                onChange={(e) => {
+                  setDe(e.target.value);
+                  setPagina(1);
+                }}
+                className="bg-transparent px-2 py-1.5 text-sm font-medium text-slate-400 outline-none filter invert brightness-200 focus:text-cyan-400"
+              />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-600">até</span>
+              <input
+                type="date"
+                value={ate}
+                onChange={(e) => {
+                  setAte(e.target.value);
+                  setPagina(1);
+                }}
+                className="bg-transparent px-2 py-1.5 text-sm font-medium text-slate-400 outline-none filter invert brightness-200 focus:text-cyan-400"
+              />
+            </div>
+
+            {(busca || de || ate) && (
+              <button
+                onClick={limpar}
+                className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-slate-400 transition hover:bg-slate-800 hover:text-white"
+              >
+                Limpar Filtros
+              </button>
+            )}
+
+            <button
+              onClick={exportarCSV}
+              className="ml-auto inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-cyan-500/10 transition-all hover:brightness-110 active:scale-95"
+            >
+              <Icon name="download" />
+              Exportar Base
+            </button>
           </div>
 
-          {(busca || de || ate) && (
-            <button
-              onClick={limpar}
-              className="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
-            >
-              Limpar Filtros
-            </button>
-          )}
+          {/* Info bar da contagem */}
+          <div className="bg-[#0e141f]/40 px-6 py-2 border-b border-slate-800/40">
+            <p className="text-xs font-medium text-slate-500">
+              Query retornou <span className="text-cyan-400 font-bold">{filtrados.length}</span> registros 
+              {filtrados.length !== leads.length && ` de um total de ${leads.length}`}
+            </p>
+          </div>
 
-          <button
-            onClick={exportarCSV}
-            className="ml-auto inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-300"
-          >
-            <Icon name="download" />
-            Exportar CSV
-          </button>
-        </div>
-
-        <div className="mt-6 mb-4 flex items-center justify-between">
-          <p className="text-sm font-medium text-slate-500">
-            Exibindo <strong className="text-slate-900">{filtrados.length}</strong> registro{filtrados.length !== 1 ? "s" : ""}
-            {filtrados.length !== leads.length && ` de ${leads.length} totais`}
-          </p>
-        </div>
-
-        {/* Tabela Melhorada */}
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-100">
+          {/* Área da Tabela */}
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/80 text-xs uppercase tracking-wider text-slate-500">
-                  <th className="px-6 py-4 font-semibold">Cliente</th>
-                  <th className="px-6 py-4 font-semibold">Contato</th>
-                  <th className="px-6 py-4 font-semibold">Cidade</th>
-                  <th className="px-6 py-4 font-semibold">MAC AP</th>
-                  <th className="px-6 py-4 font-semibold">Data de Registro</th>
+                <tr className="border-b border-slate-800/80 bg-[#0e141f]/60 text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <th className="px-6 py-4">Usuário / Identificação</th>
+                  <th className="px-6 py-4">Informações de Contato</th>
+                  <th className="px-6 py-4">Cidade / Região</th>
+                  <th className="px-6 py-4">Ponto de Acesso (AP)</th>
+                  <th className="px-6 py-4 text-right">Data/Hora</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-800/50">
                 {visiveis.map((l) => (
-                  <tr key={l.id} className="group transition-colors hover:bg-indigo-50/40">
-                    <td className="px-6 py-4">
+                  <tr key={l.id} className="transition-colors hover:bg-slate-800/20 group">
+                    {/* Usuário */}
+                    <td className="px-6 py-4.5">
                       <div className="flex items-center gap-3.5">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-100 to-blue-50 text-xs font-bold text-indigo-700 ring-2 ring-white">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-xs font-black text-cyan-400 border border-slate-700/60 group-hover:border-cyan-500/30 group-hover:bg-cyan-950/20 transition-all">
                           {iniciais(l.nome)}
                         </div>
-                        <span className="font-semibold text-slate-900 group-hover:text-indigo-900 transition-colors">
+                        <span className="font-bold text-white tracking-wide group-hover:text-cyan-300 transition-colors">
                           {l.nome}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-slate-700">{l.email || "—"}</div>
-                      <div className="mt-0.5 text-xs text-slate-500">
+                    
+                    {/* Contato */}
+                    <td className="px-6 py-4.5">
+                      <div className="font-medium text-slate-300">{l.email || "—"}</div>
+                      <div className="mt-0.5 font-mono text-xs text-slate-500">
                         {l.telefone || "—"}
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-medium text-slate-600">
+                    
+                    {/* Cidade */}
+                    <td className="px-6 py-4.5 font-semibold text-slate-400">
                       {l.cidade || "—"}
                     </td>
-                    <td className="px-6 py-4">
+                    
+                    {/* MAC AP */}
+                    <td className="px-6 py-4.5">
                       {l.mac_ap ? (
-                        <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-[11px] font-semibold text-slate-600">
+                        <span className="inline-flex items-center rounded-lg border border-slate-800 bg-slate-900 px-2.5 py-1 font-mono text-[11px] font-bold text-slate-400 shadow-inner group-hover:border-slate-700 transition-colors">
                           {l.mac_ap}
                         </span>
                       ) : (
-                        <span className="text-slate-300">—</span>
+                        <span className="text-slate-600">—</span>
                       )}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 font-medium text-slate-500">
+                    
+                    {/* Data */}
+                    <td className="whitespace-nowrap px-6 py-4.5 text-right font-mono text-xs text-slate-500">
                       {dataHoraBR(l.created_at)}
                     </td>
                   </tr>
                 ))}
+
                 {visiveis.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-6 py-20 text-center">
-                      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-50 text-slate-400 ring-4 ring-slate-50/50">
+                    <td colSpan={5} className="px-6 py-24 text-center">
+                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 border border-slate-800 text-slate-600">
                         <Icon name="inbox" />
                       </div>
-                      <h3 className="text-sm font-semibold text-slate-900">Nenhum lead encontrado</h3>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Tente ajustar os filtros de busca ou as datas selecionadas.
+                      <h4 className="text-base font-bold text-slate-400">Nenhum registro mapeado</h4>
+                      <p className="mt-1 text-sm text-slate-600 max-w-xs mx-auto">
+                        Não existem leads capturados para os critérios informados nesta pesquisa.
                       </p>
                     </td>
                   </tr>
@@ -330,18 +362,19 @@ export default function AdminDashboard({
             </table>
           </div>
 
-          {/* Paginação Estilizada */}
+          {/* Paginação Estilo Grid */}
           {filtrados.length > 0 && (
-            <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50/50 px-6 py-4 text-sm">
+            <div className="flex items-center justify-between border-t border-slate-800/80 bg-[#0e141f]/30 px-6 py-4 text-sm">
               <span className="font-medium text-slate-500">
-                Mostrando <strong className="text-slate-900">{inicio + 1}</strong> a <strong className="text-slate-900">{Math.min(inicio + POR_PAGINA, filtrados.length)}</strong> de{" "}
-                <strong className="text-slate-900">{filtrados.length}</strong>
+                Mostrando <span className="text-slate-300 font-bold">{inicio + 1}</span> a <span className="text-slate-300 font-bold">{Math.min(inicio + POR_PAGINA, filtrados.length)}</span> de{" "}
+                <span className="text-cyan-400 font-bold">{filtrados.length}</span> bases filtradas
               </span>
+              
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPagina((p) => Math.max(1, p - 1))}
                   disabled={paginaSegura === 1}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 font-semibold text-slate-600 transition-all hover:bg-slate-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 px-4 py-2 font-bold text-slate-400 transition hover:bg-slate-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-slate-900 disabled:hover:text-slate-400"
                 >
                   <Icon name="left" />
                   Anterior
@@ -349,7 +382,7 @@ export default function AdminDashboard({
                 <button
                   onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
                   disabled={paginaSegura === totalPaginas}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 font-semibold text-slate-600 transition-all hover:bg-slate-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 px-4 py-2 font-bold text-slate-400 transition hover:bg-slate-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-slate-900 disabled:hover:text-slate-400"
                 >
                   Próxima
                   <Icon name="right" />
@@ -367,27 +400,24 @@ function StatCard({
   label,
   valor,
   icon,
-  color = "from-blue-500 to-blue-600",
-  bgIcon = "bg-blue-50 text-blue-600"
+  gradient,
 }: {
   label: string;
   valor: number;
   icon: IconName;
-  color?: string;
-  bgIcon?: string;
+  gradient: string;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-slate-300">
-      <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${color} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
-      <div className="flex items-start justify-between">
-        <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+    <div className={`relative overflow-hidden rounded-2xl border bg-[#0c1017]/40 p-6 shadow-xl backdrop-blur-sm bg-gradient-to-br ${gradient}`}>
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
           {label}
         </p>
-        <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${bgIcon}`}>
+        <span className="opacity-80">
           <Icon name={icon} />
         </span>
       </div>
-      <p className="mt-4 text-4xl font-bold tracking-tight text-slate-900">{valor}</p>
+      <p className="mt-4 text-4xl font-black tracking-tight text-white">{valor}</p>
     </div>
   );
 }
@@ -466,12 +496,12 @@ function Icon({ name }: { name: IconName }) {
   };
   return (
     <svg
-      width="20"
-      height="20"
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
